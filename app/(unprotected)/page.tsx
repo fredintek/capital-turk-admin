@@ -1,7 +1,9 @@
 export default function Home() {
   return (
-    <div>
-      <p>LOGIN</p>
+    <div className="h-screen w-screen">
+      <div className="container grid place-items-center h-full">
+        <p>LOGIN</p>
+      </div>
     </div>
   );
 }
