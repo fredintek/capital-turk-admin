@@ -6,7 +6,7 @@ import {
   FetchBaseQueryError,
 } from "@reduxjs/toolkit/query/react";
 import { RootState } from "../store";
-import { setAccessToken } from "../slices/authSlice";
+import { logoutUser, setAccessToken } from "../slices/authSlice";
 import { authApiSlice } from "./authApiSlice";
 
 // Define a base query with refresh token handling
@@ -33,7 +33,7 @@ const baseQueryWithReauth: BaseQueryFn<
   // Make the initial API request
   let result = await baseQuery(args, api, extraOptions);
 
-  // If unauthorized (401), attempt to refresh the token
+  // If forbidden (403), attempt to refresh the token
   if (result.error && result.error.status === 403) {
     console.warn("Access token expired, attempting refresh...");
 
@@ -44,12 +44,16 @@ const baseQueryWithReauth: BaseQueryFn<
       extraOptions
     );
 
-    if (
-      refreshResult.data &&
-      typeof refreshResult.data === "object" &&
-      "token" in refreshResult.data
-    ) {
-      const newAccessToken = (refreshResult.data as { token: string }).token;
+    console.log("refreshResult", refreshResult);
+
+    if (refreshResult.data) {
+      const newAccessToken = (
+        refreshResult.data as {
+          status: string;
+          message: string;
+          data: { token: string };
+        }
+      ).data.token;
 
       // Store the new access token in Redux
       api.dispatch(setAccessToken(newAccessToken));
@@ -61,6 +65,9 @@ const baseQueryWithReauth: BaseQueryFn<
       console.error("Failed to refresh token. Logging out...");
       await api.dispatch(authApiSlice.endpoints.logout.initiate(undefined));
     }
+  } else {
+    // logout user if any problems other than 403 is encountered
+    api.dispatch(logoutUser(undefined));
   }
 
   return result;

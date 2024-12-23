@@ -10,6 +10,10 @@ export interface CurrentUserObj {
 }
 
 export type LoginResponse = {
-  token: string;
-  user: Partial<CurrentUserObj>;
+  data: {
+    token: string;
+    user: Partial<CurrentUserObj>;
+  };
+  status: string;
+  message: string;
 };

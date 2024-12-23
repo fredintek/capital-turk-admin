@@ -11,7 +11,7 @@ import {
 import createWebStorage from "redux-persist/lib/storage/createWebStorage";
 import { setupListeners } from "@reduxjs/toolkit/query";
 import { apiSlice } from "./api";
-import { authSlice } from "./slices";
+import { authSlice, sidebarSlice } from "./slices";
 
 type NoopStorage = {
   getItem: (key: string) => Promise<null>;
@@ -47,6 +47,7 @@ const persistConfig = {
 const rootReducer = combineReducers({
   [apiSlice.reducerPath]: apiSlice.reducer,
   auth: authSlice,
+  sidebar: sidebarSlice,
 });
 
 // persist reducer

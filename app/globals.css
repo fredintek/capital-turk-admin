@@ -34,3 +34,7 @@ code,
 pre {
   font-family: var(--font-roboto-mono); /* Mono font for code or special text */
 }
+
+.ant-form-item {
+  margin-bottom: 0px !important;
+}

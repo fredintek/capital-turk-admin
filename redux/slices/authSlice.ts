@@ -1,8 +1,7 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { authApiSlice } from "../api/authApiSlice";
-import { LoginResponse } from "@/utilities/interfaces";
 
-const initialState: Partial<LoginResponse> = {
+const initialState = {
   user: {},
   token: "",
 };
@@ -15,27 +14,31 @@ const authSlice = createSlice({
     setAccessToken: (state, action) => {
       state.token = action.payload;
     },
+    logoutUser: (state, payload) => {
+      state.user = {};
+      state.token = "";
+    },
   },
   extraReducers: (builder) => {
     builder
       .addMatcher(
         authApiSlice.endpoints.login.matchFulfilled,
         (state, action) => {
-          return {
-            user: action.payload.user,
-            token: action.payload.token,
-          };
+          console.log(action.payload);
+          state.user = action.payload.data.user;
+          state.token = action.payload.data.token;
         }
       )
       .addMatcher(
         authApiSlice.endpoints.logout.matchFulfilled,
         (state, action) => {
-          return {};
+          state.user = {};
+          state.token = "";
         }
       );
   },
 });
 
-export const { setAccessToken } = authSlice.actions;
+export const { setAccessToken, logoutUser } = authSlice.actions;
 
 export default authSlice.reducer;
