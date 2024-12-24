@@ -22,7 +22,29 @@ export const authApiSlice = apiSlice.injectEndpoints({
         method: "POST",
       }),
     }),
+
+    // forgot password
+    forgotPassword: builder.mutation({
+      query: ({ email }) => ({
+        url: "/user/forgot-password",
+        method: "POST",
+        body: { email },
+      }),
+    }),
+
+    resetPassword: builder.mutation({
+      query: ({ token, password }) => ({
+        url: `/user/reset-password/${token}`,
+        method: "PATCH",
+        body: { password },
+      }),
+    }),
   }),
 });
 
-export const { useLoginMutation, useLogoutMutation } = authApiSlice;
+export const {
+  useLoginMutation,
+  useLogoutMutation,
+  useForgotPasswordMutation,
+  useResetPasswordMutation,
+} = authApiSlice;
