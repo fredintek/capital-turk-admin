@@ -1,6 +1,7 @@
 "use client";
 import FormLoadingSpinner from "@/components/loaders/FormLoadingSpinner";
 import {
+  useCreateFunMutation,
   useDeleteFunMutation,
   useEditFunMutation,
   useGetAllFunQuery,
@@ -13,8 +14,6 @@ import {
   UploadOutlined,
 } from "@ant-design/icons";
 import {
-  Button,
-  DatePicker,
   Form,
   Input,
   Modal,
@@ -27,19 +26,18 @@ import FormItem from "antd/es/form/FormItem";
 import TextArea from "antd/es/input/TextArea";
 import { ColumnsType } from "antd/es/table";
 import dayjs from "dayjs";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import toast from "react-hot-toast";
 
 type Props = {};
 
 const page = (props: Props) => {
   const [form] = Form.useForm();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalType, setModalType] = useState<"create" | "edit">("create");
   const [editRecord, setEditRecord] = useState<FunResponseData | null>(null);
   const {
     data: allFunData,
-    error: allFunError,
-    isError: allFunIsError,
-    isSuccess: allFunIsSuccess,
     isLoading: allFunIsLoading,
     refetch: refetchFunData,
   } = useGetAllFunQuery(undefined, {
@@ -47,12 +45,86 @@ const page = (props: Props) => {
     refetchOnReconnect: true,
   });
 
-  const [deleteFun] = useDeleteFunMutation();
-  const [editFun, { isLoading: editFunLoading }] = useEditFunMutation();
+  const [
+    deleteFun,
+    {
+      error: deletedFunError,
+      isError: deletedFunIsError,
+      isSuccess: deletedFunIsSuccess,
+      isLoading: deletedFunIsLoading,
+      data: deletedFunData,
+    },
+  ] = useDeleteFunMutation();
+
+  const [
+    editFun,
+    {
+      error: editFunError,
+      isError: editFunIsError,
+      isSuccess: editFunIsSuccess,
+      isLoading: editFunIsLoading,
+      data: editFunData,
+    },
+  ] = useEditFunMutation();
+
+  const [
+    createFun,
+    {
+      error: createFunError,
+      isError: createFunIsError,
+      isSuccess: createFunIsSuccess,
+      isLoading: createFunIsLoading,
+      data: createFunData,
+    },
+  ] = useCreateFunMutation();
 
   const handleDeleteFunData = async (id: string) => {
     await deleteFun(id);
     refetchFunData();
+  };
+
+  const handleCreateFunData = async (values: any) => {
+    const formData = new FormData();
+    formData.append("time", dayjs(values.time).toString());
+    formData.append("title", values.title);
+    formData.append("content", values.content);
+
+    if (values.image) {
+      formData.append("image", values.image[0].originFileObj);
+    }
+
+    await createFun(formData);
+    setIsModalOpen(false);
+    refetchFunData();
+  };
+
+  const handleUpdateFunData = async (values: any) => {
+    // Create a new FormData object
+    const formData = new FormData();
+
+    // Append basic form data
+    formData.append("id", editRecord?._id || "");
+    formData.append("time", dayjs(values.time).toString());
+    formData.append("title", values.title);
+    formData.append("content", values.content);
+
+    // Check if an image is included
+    if (values.image) {
+      formData.append("image", values.image[0].originFileObj);
+    }
+
+    await editFun(formData);
+    // Handle modal close and data refetching
+    setIsModalOpen(false);
+    refetchFunData();
+  };
+
+  const handleFormSubmit = (values: any) => {
+    if (modalType === "create") {
+      handleCreateFunData(values);
+    } else {
+      handleUpdateFunData(values);
+    }
   };
 
   const columns: ColumnsType<FunResponseData> = [
@@ -115,6 +187,7 @@ const page = (props: Props) => {
               onClick={() => {
                 setIsModalOpen(true);
                 setEditRecord(record);
+                setModalType("edit");
               }}
               className="text-gray-600 text-lg cursor-pointer"
             />
@@ -136,49 +209,69 @@ const page = (props: Props) => {
     key: item._id || index,
   }));
 
-  const handleUpdateFunData = async (values: any) => {
-    // Create a new FormData object
-    const formData = new FormData();
-
-    // Append basic form data
-    formData.append("id", editRecord?._id || "");
-    formData.append("time", dayjs(values.time).toString());
-    formData.append("title", values.title);
-    formData.append("content", values.content);
-
-    // Check if an image is included
-    if (values.image) {
-      formData.append("image", values.image[0].originFileObj);
+  useEffect(() => {
+    if (deletedFunIsSuccess) {
+      toast.success(deletedFunData.message);
     }
 
-    // Log formData to verify it's being set correctly
-    // for (let [key, value] of formData.entries()) {
-    //   console.log(`${key}:`, value);
-    // }
+    if (deletedFunIsError) {
+      const customError = deletedFunError as { data: any; status: number };
+      toast.error(customError.data.message);
+    }
+  }, [
+    deletedFunError,
+    deletedFunIsError,
+    deletedFunIsLoading,
+    deletedFunIsSuccess,
+  ]);
 
-    await editFun(formData);
-    // Handle modal close and data refetching
-    setIsModalOpen(false);
-    refetchFunData();
-  };
+  useEffect(() => {
+    if (editFunIsSuccess) {
+      toast.success(editFunData.message);
+    }
+
+    if (editFunIsError) {
+      const customError = editFunError as {
+        data: any;
+        status: number;
+      };
+      toast.error(customError.data.message);
+    }
+  }, [editFunError, editFunIsError, editFunIsLoading, editFunIsSuccess]);
+
+  useEffect(() => {
+    if (createFunIsSuccess) {
+      toast.success(createFunData.message);
+    }
+
+    if (createFunIsError) {
+      const customError = createFunError as { data: any; status: number };
+      toast.error(customError.data.message);
+    }
+  }, [createFunError, createFunIsError, createFunIsSuccess, createFunData]);
 
   return (
-    <div className="border h-full p-3">
-      {/* create fun data cta button */}
-      <button className="flex mb-3 items-center gap-2 hover:bg-blue-800 transition-colors duration-300 py-2 px-3 bg-blue-500 rounded-lg text-white font-medium">
+    <div className="h-full p-3">
+      <button
+        onClick={() => {
+          setIsModalOpen(true);
+          setModalType("create");
+          form.resetFields();
+        }}
+        className="flex mb-3 items-center gap-2 hover:bg-blue-800 transition-colors duration-300 py-2 px-3 bg-blue-500 rounded-lg text-white font-medium"
+      >
         <PlusCircleOutlined />
-        <span>Create Fun Data</span>
+        <span>Add Data</span>
       </button>
       <Table
-        className="h-full"
-        scroll={{ x: "100%" }}
         columns={columns}
-        loading={allFunIsLoading}
         dataSource={dataSource}
+        loading={allFunIsLoading}
+        scroll={{ x: "100%" }}
       />
 
       <Modal
-        title="Edit Fun Data"
+        title={modalType === "create" ? "Add Data" : "Edit Data"}
         open={isModalOpen}
         onCancel={() => {
           setIsModalOpen(false);
@@ -201,8 +294,16 @@ const page = (props: Props) => {
               key="submit"
               className="border flex items-center gap-1 justify-center py-2 px-3 bg-blue-500 rounded-lg text-white font-medium"
             >
-              {editFunLoading && <FormLoadingSpinner />}
-              <span className={`${editFunLoading ? "mt-1" : ""}`}>Submit</span>
+              {(editFunIsLoading || createFunIsLoading) && (
+                <FormLoadingSpinner />
+              )}
+              <span
+                className={`${
+                  editFunIsLoading || createFunIsLoading ? "mt-1" : ""
+                }`}
+              >
+                Submit
+              </span>
             </button>
           </div>
         }
@@ -210,13 +311,17 @@ const page = (props: Props) => {
         <Form
           form={form}
           layout="vertical"
-          onFinish={handleUpdateFunData}
+          onFinish={handleFormSubmit}
           className="mt-4 flex flex-col gap-4"
-          initialValues={{
-            time: dayjs(editRecord?.time),
-            title: editRecord?.title,
-            content: editRecord?.content,
-          }}
+          initialValues={
+            modalType === "edit"
+              ? {
+                  time: dayjs(editRecord?.time),
+                  title: editRecord?.title,
+                  content: editRecord?.content,
+                }
+              : {}
+          }
         >
           <div className="">
             <FormItem label="Time" name="time">
@@ -240,9 +345,8 @@ const page = (props: Props) => {
             <FormItem
               label="Image"
               name="image"
-              valuePropName="fileList" // Tells Ant Design to bind the value as 'fileList'
+              valuePropName="fileList"
               getValueFromEvent={(e) => {
-                // Normalize the value from the upload event
                 if (Array.isArray(e)) {
                   return e;
                 }

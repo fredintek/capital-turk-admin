@@ -44,12 +44,12 @@ pre {
 
 /* Scrollbar thumb */
 ::-webkit-scrollbar-thumb {
-  background: #ef4444; 
+  background: #00000040; 
   border-radius: 4px;
   cursor: pointer;
 }
 
 /* Scrollbar hover effect */
 ::-webkit-scrollbar-thumb:hover {
-  background: #dc2626;
+  background: #00000040;
 }

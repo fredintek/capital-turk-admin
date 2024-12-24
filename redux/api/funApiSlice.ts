@@ -42,11 +42,10 @@ export const funApiSlice = apiSlice.injectEndpoints({
     // edit fun data
     editFun: builder.mutation({
       query: (body) => {
-        const formData = body;
         return {
-          url: `/fun/${formData.get("id")}`,
+          url: `/fun/${body.get("id")}`,
           method: "PATCH",
-          body: formData,
+          body,
         };
       },
       invalidatesTags: (result, error, args) => [
@@ -54,8 +53,24 @@ export const funApiSlice = apiSlice.injectEndpoints({
         { type: "Fun", id: "LIST" },
       ],
     }),
+
+    // create fun data
+    createFun: builder.mutation({
+      query: (body) => {
+        return {
+          url: "/fun",
+          method: "POST",
+          body,
+        };
+      },
+      invalidatesTags: (result, error, args) => [{ type: "Fun", id: "LIST" }],
+    }),
   }),
 });
 
-export const { useGetAllFunQuery, useDeleteFunMutation, useEditFunMutation } =
-  funApiSlice;
+export const {
+  useGetAllFunQuery,
+  useDeleteFunMutation,
+  useEditFunMutation,
+  useCreateFunMutation,
+} = funApiSlice;

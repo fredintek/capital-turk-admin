@@ -39,7 +39,7 @@ export default function RootLayout({
       {/* CHILDREN */}
       <main className="h-[calc(100vh-83.6px)] flex">
         <SideBar />
-        <div className="px-4 py-6 bg-gray-300 flex-1">
+        <div className="px-4 py-6 bg-gray-300 flex-1 h-full w-screen">
           <div className="h-full border overflow-hidden rounded-lg">
             <section className="bg-white h-full overflow-y-auto rounded-lg">
               {children}

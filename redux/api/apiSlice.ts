@@ -7,7 +7,6 @@ import {
 } from "@reduxjs/toolkit/query/react";
 import { RootState } from "../store";
 import { logoutUser, setAccessToken } from "../slices/authSlice";
-import { authApiSlice } from "./authApiSlice";
 
 // Define a base query with refresh token handling
 const baseQueryWithReauth: BaseQueryFn<
