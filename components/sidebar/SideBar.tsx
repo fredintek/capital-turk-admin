@@ -62,6 +62,7 @@ const SideBar = (props: Props) => {
       toast.error(customError.data.message);
     }
   }, [isSuccess, isError, error, data]);
+
   return (
     <div
       className={`fixed flex left-0 h-[calc(100vh-83.6px)] w-64 bg-[#0d0d1f] transform transition-transform duration-300 z-40 ${

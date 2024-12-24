@@ -63,11 +63,8 @@ const baseQueryWithReauth: BaseQueryFn<
     } else {
       // Refresh token failed, log out the user
       console.error("Failed to refresh token. Logging out...");
-      await api.dispatch(authApiSlice.endpoints.logout.initiate(undefined));
+      api.dispatch(logoutUser(undefined));
     }
-  } else {
-    // logout user if any problems other than 403 is encountered
-    api.dispatch(logoutUser(undefined));
   }
 
   return result;
@@ -80,5 +77,6 @@ export const apiSlice = createApi({
   // baseQuery: fetchBaseQuery({
   //   baseUrl: process.env.NEXT_PUBLIC_BASE_URL,
   // }),
+  tagTypes: ["Fun"],
   endpoints: (builder) => ({}),
 });
