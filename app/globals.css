@@ -31,3 +31,25 @@ pre {
 .ant-form-item {
   margin-bottom: 0px !important;
 }
+
+/* Scrollbar main track */
+::-webkit-scrollbar {
+  width: 5px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f0f0f0;
+  border-radius: 4px; 
+}
+
+/* Scrollbar thumb */
+::-webkit-scrollbar-thumb {
+  background: #ef4444; 
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+/* Scrollbar hover effect */
+::-webkit-scrollbar-thumb:hover {
+  background: #dc2626;
+}

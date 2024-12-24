@@ -1,10 +1,14 @@
-import { redirect } from "next/navigation";
+"use client";
 import React from "react";
 
 type Props = {};
 
 const page = (props: Props) => {
-  redirect("/dashboard/fun");
+  return (
+    <div>
+      <h1>FUN</h1>
+    </div>
+  );
 };
 
 export default page;

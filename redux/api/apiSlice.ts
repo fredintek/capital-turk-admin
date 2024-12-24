@@ -44,7 +44,7 @@ const baseQueryWithReauth: BaseQueryFn<
       extraOptions
     );
 
-    console.log("refreshResult", refreshResult);
+    // console.log("refreshResult", refreshResult);
 
     if (refreshResult.data) {
       const newAccessToken = (

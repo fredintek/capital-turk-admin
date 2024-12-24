@@ -37,9 +37,15 @@ export default function RootLayout({
       <Navbar />
 
       {/* CHILDREN */}
-      <main className="min-h-[calc(100vh-83.6px)] flex">
+      <main className="h-[calc(100vh-83.6px)] flex">
         <SideBar />
-        <div className="p-4 bg-gray-300 flex-1">{children}</div>
+        <div className="px-4 py-6 bg-gray-300 flex-1">
+          <div className="h-full border overflow-hidden rounded-lg">
+            <section className="bg-white h-full overflow-y-auto rounded-lg">
+              {children}
+            </section>
+          </div>
+        </div>
       </main>
     </div>
   );
